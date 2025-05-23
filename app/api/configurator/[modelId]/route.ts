@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   try {
     const dispatcher = new Agent({ connect: { rejectUnauthorized: false } })
 
-    const getUrl = `https://pfreydemo.prefnet.net/QA-Reynaers/Cloud.ModelService/api/v1/Options/model?modelId=${modelId}`
+    const getUrl = `https://reydemo.prefnet.net/QA-Reynaers/Cloud.ModelService/api/v1/Options/model?modelId=${modelId}`
     logApiCall("GET", getUrl)
 
     const getRes = await undiciFetch(getUrl, {

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const { guid } = body
 
     // 1. Solicitar un nuevo session_id
-    const sessionResp = await fetch("http://pfreydemo.prefnet.net:8012/usd-service/v1/Session/New", {
+    const sessionResp = await fetch("http://reydemo.prefnet.net:8012/usd-service/v1/Session/New", {
       method: "POST",
       headers: {
         accept: "*/*",
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Usar el session_id en la petición de imágenes
-    const imagesResp = await fetch(`http://pfreydemo.prefnet.net:8012/usd-service/v1/Images?sessionId=${sessionId}`, {
+    const imagesResp = await fetch(`http://reydemo.prefnet.net:8012/usd-service/v1/Images?sessionId=${sessionId}`, {
       method: "POST",
       headers: {
         accept: "*/*",

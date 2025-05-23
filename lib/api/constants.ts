@@ -1,8 +1,8 @@
 // API configuration with hardcoded values
 export const API_CONFIG = {
-  baseUrl: "https://pfreydemo.prefnet.net/qa-reynaers",
-  pwbBaseUrl: "https://pfreydemo.prefnet.net/qa-reynaers/prefweb",
-  omniverse: "https://pfreydemo.prefnet.net",
+  baseUrl: "https://reydemo.prefnet.net/qa-reynaers",
+  pwbBaseUrl: "https://reydemo.prefnet.net/qa-reynaers/prefweb",
+  omniverse: "https://reydemo.prefnet.net",
   username: "api@preferencesl.com",
   password: "api$1234",
   // API parameters
