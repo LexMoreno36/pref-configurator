@@ -1,95 +1,94 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
+
+import type React from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ExternalLink, Code, ImageIcon, Layers, Package, RefreshCw, Database, Settings } from "lucide-react"
+import { ExternalLink, Code, ImageIcon, Layers, RefreshCw, Database, Settings } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 export default function DocumentationPage() {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<string>("overview")
 
+  useEffect(() => {
+    // Redirect to home page after a short delay
+    const timer = setTimeout(() => {
+      router.push("/")
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [router])
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
+      <header className="border-b border-gray-200 bg-white px-6 py-4 shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center">
-            <Button variant="ghost" onClick={() => router.push("/")} className="mr-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Button>
-            <h1 className="text-xl font-bold text-gray-900">API Documentation</h1>
+            <div className="mr-3 h-10 w-10 rounded-lg bg-orange-500 p-2 shadow-md">
+              <svg viewBox="0 0 24 24" fill="none" className="text-white">
+                <path
+                  d="M3 7.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V7.8C21 6.11984 21 5.27976 20.673 4.63803C20.3854 4.07354 19.9265 3.6146 19.362 3.32698C18.7202 3 17.8802 3 16.2 3H7.8C6.11984 3 5.27976 3 4.63803 3.32698C4.07354 3.6146 3.6146 4.07354 3.32698 4.63803C3 5.27976 3 6.11984 3 7.8Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path d="M3 9H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M9 21V9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-medium text-gray-900">
+              <span className="font-bold">Window</span> Configurator
+            </h1>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="flex-1 px-4 py-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-8 md:flex-row">
-            {/* Sidebar */}
-            <div className="w-full md:w-64 shrink-0">
-              <div className="sticky top-24 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <nav className="space-y-1">
-                  <NavItem
-                    icon={<Package className="h-4 w-4" />}
-                    title="Overview"
-                    active={activeSection === "overview"}
-                    onClick={() => setActiveSection("overview")}
-                  />
-                  {/*<NavItem
-                    icon={<Key className="h-4 w-4" />}
-                    title="Authentication"
-                    active={activeSection === "authentication"}
-                    onClick={() => setActiveSection("authentication")}
-                  />*/}
-                  <NavItem
-                    icon={<Database className="h-4 w-4" />}
-                    title="Models"
-                    active={activeSection === "models"}
-                    onClick={() => setActiveSection("models")}
-                  />
-                  <NavItem
-                    icon={<Settings className="h-4 w-4" />}
-                    title="Configuration"
-                    active={activeSection === "configuration"}
-                    onClick={() => setActiveSection("configuration")}
-                  />
-                  <NavItem
-                    icon={<Layers className="h-4 w-4" />}
-                    title="Dimensions"
-                    active={activeSection === "dimensions"}
-                    onClick={() => setActiveSection("dimensions")}
-                  />
-                  <NavItem
-                    icon={<ImageIcon className="h-4 w-4" />}
-                    title="Visualizations"
-                    active={activeSection === "visualizations"}
-                    onClick={() => setActiveSection("visualizations")}
-                  />
-                  <NavItem
-                    icon={<RefreshCw className="h-4 w-4" />}
-                    title="Integration Flow"
-                    active={activeSection === "integration"}
-                    onClick={() => setActiveSection("integration")}
-                  />
-                </nav>
+      <main className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="text-center max-w-md mx-auto">
+          <div className="mb-8">
+            <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+              <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Documentation Coming Soon</h2>
+            <p className="text-gray-600 mb-6">
+              We're working hard to bring you comprehensive documentation. This feature will be available soon!
+            </p>
+          </div>
+
+          <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
+                <div
+                  className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.1s" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0.2s" }}
+                ></div>
               </div>
             </div>
-
-            {/* Content */}
-            <div className="flex-1 space-y-8">
-              {activeSection === "overview" && <OverviewSection />}
-              {/*activeSection === "authentication" && <AuthenticationSection />*/}
-              {activeSection === "models" && <ModelsSection />}
-              {activeSection === "configuration" && <ConfigurationSection />}
-              {activeSection === "dimensions" && <DimensionsSection />}
-              {activeSection === "visualizations" && <VisualizationsSection />}
-              {activeSection === "integration" && <IntegrationSection />}
+            <p className="text-sm text-gray-500 mb-4">Updating documentation in progress...</p>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-orange-500 h-2 rounded-full animate-pulse" style={{ width: "65%" }}></div>
             </div>
+            <p className="text-xs text-gray-400 mt-2">Redirecting to home page in a few seconds...</p>
+          </div>
+
+          <div className="mt-8 text-sm text-gray-500">
+            <p>In the meantime, you can:</p>
+            <ul className="mt-2 space-y-1">
+              <li>• Explore the window configurator</li>
+              <li>• Try different configuration options</li>
+              <li>• Test the 2D and 3D visualizations</li>
+            </ul>
           </div>
         </div>
       </main>
@@ -98,7 +97,7 @@ export default function DocumentationPage() {
       <footer className="border-t border-gray-200 bg-white px-6 py-4">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center justify-center">
-            <span className="text-sm text-gray-600">© 2025 Window Configurator API Documentation</span>
+            <span className="text-sm text-gray-600">© 2025 Window Configurator - Documentation Coming Soon</span>
           </div>
         </div>
       </footer>
@@ -804,7 +803,7 @@ function processSvgResponseToString(encodedSvg) {
 
   // Convert binary data to Uint8Array
   const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; <binaryString className="length"></binaryString>; i++) {
+  for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
 

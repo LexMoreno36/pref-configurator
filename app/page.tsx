@@ -195,13 +195,14 @@ export default function HomePage() {
               <span className="font-bold">Window</span> Configurator
             </h1>
           </div>
-          <Button
+        <Button
             variant="outline"
-            onClick={() => router.push("/documentation")}
-            className="flex items-center border-gray-200 text-gray-700 hover:text-orange-600 hover:border-orange-200 hover:bg-orange-50 transition-colors"
+            disabled
+            className="flex items-center border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
           >
             <FileText className="mr-2 h-4 w-4" />
             Documentation
+            <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">Coming Soon</span>
           </Button>
         </div>
       </header>
