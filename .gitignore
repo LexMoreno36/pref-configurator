@@ -1,0 +1,51 @@
+# Node modules
+node_modules/
+
+# Build output
+.next/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*.local
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+
+# Testing
+coverage/
+
+# Next.js build cache
+.next/cache
+
+# Optional npm cache directory
+.npm/
+
+# Optional yarn cache directory
+.yarn/
+
+# Optional: if using TurboRepo or monorepo tooling
+turbo/
+
+# Misc
+*.local
+
+# GLTF model files and their binaries
+*.gltf
+*.glb
+*.bin
+
+# …but do NOT ignore AntiqueCamera.glb
+!AntiqueCamera.glb

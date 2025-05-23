@@ -1,0 +1,47 @@
+{
+  "productGroups": [
+    {
+      "id": "sliding-folding",
+      "name": "Sliding / Folding",
+      "default": true
+    },
+    {
+      "id": "window",
+      "name": "Window"
+    },
+    {
+      "id": "door",
+      "name": "Door"
+    },
+    {
+      "id": "corner",
+      "name": "Corner"
+    }
+  ],
+  "openingTypes": [
+    {
+      "id": "one-sliding-vent",
+      "name": "One sliding vent",
+      "default": true,
+      "modelCode": "1_vent_1rail_OG"
+    },
+    {
+      "id": "two-sliding-vents",
+      "name": "Two sliding vents",
+      "modelCode": "2_vent_2rail"
+    }
+  ],
+  "systems": [
+    {
+      "id": "masterpatio",
+      "name": "MasterPatio",
+      "hasModels": true,
+      "default": true
+    },
+    {
+      "id": "hifinity",
+      "name": "HiFinity",
+      "hasModels": false
+    }
+  ]
+}
