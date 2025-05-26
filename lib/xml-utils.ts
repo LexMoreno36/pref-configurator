@@ -96,7 +96,7 @@ export function createSetOptionValueCommand(optionName: string, optionValue: str
   // Extract the actual option value without the prefix (e.g., "reynaers~49_7T39" -> "49_7T39")
   const extractedValue = optionValue.includes("~") ? optionValue.split("~")[1] : optionValue
 
-return `
+  return `
         <cmd:Commands xmlns:cmd="http://www.preference.com/XMLSchemas/2006/PrefCAD.Command">
             <cmd:Command name="Model.SetOptionValue">
                 <cmd:Parameter name="name" type="string" value="RY_${extractedName}" />

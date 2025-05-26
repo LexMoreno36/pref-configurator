@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Preference Configurator",
@@ -19,7 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}
+      <body>
+        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         <Analytics />
         <SpeedInsights />
       </body>
