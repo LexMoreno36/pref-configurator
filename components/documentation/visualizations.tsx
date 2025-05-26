@@ -1,6 +1,7 @@
 import { ImageIcon } from "lucide-react"
 import { EndpointCard } from "./endpoint-card"
 import { API_CONFIG } from "@/lib/api/constants"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export function Visualizations() {
   return (
@@ -117,10 +118,20 @@ export function Visualizations() {
         </div>
 
         <h3 className="mt-6 text-lg font-semibold text-gray-800">Processing Visualizations</h3>
-        <p className="mt-2 text-gray-600">The visualization data requires specific processing:</p>
+        <p className="mt-2 text-gray-600">
+          The visualization data requires specific processing depending on the format:
+        </p>
 
-        <pre className="mt-4 rounded bg-gray-900 p-3 text-sm text-white overflow-auto">
-          {`// Example: Processing SVG visualization
+        <Tabs defaultValue="svg" className="mt-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="svg">SVG Decoding</TabsTrigger>
+            <TabsTrigger value="gltf">GLTF Decoding</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="svg" className="mt-4">
+            <p className="mb-2 text-sm text-gray-600">SVG responses are UTF-16LE encoded and need special handling:</p>
+            <pre className="rounded bg-gray-900 p-3 text-sm text-white overflow-auto">
+              {`// Processing SVG visualization
 function processSvgResponseToString(encodedSvg) {
   // Remove quotes if they exist
   let cleanBase64 = encodedSvg;
@@ -142,8 +153,74 @@ function processSvgResponseToString(encodedSvg) {
   const svgString = decoder.decode(bytes);
 
   return svgString;
-}`}
-        </pre>
+}
+
+// Usage
+const svgString = processSvgResponseToString(response.base64);
+document.getElementById('svg-container').innerHTML = svgString;`}
+            </pre>
+          </TabsContent>
+
+          <TabsContent value="gltf" className="mt-4">
+            <p className="mb-2 text-sm text-gray-600">
+              GLTF responses are binary data that need to be converted to a Blob for use with 3D libraries:
+            </p>
+            <pre className="rounded bg-gray-900 p-3 text-sm text-white overflow-auto">
+              {`// Processing GLTF/GLB visualization
+function processGltfResponseToBlob(encodedGltf) {
+  // Remove quotes if they exist
+  let cleanBase64 = encodedGltf;
+  if (cleanBase64.startsWith('"') && cleanBase64.endsWith('"')) {
+    cleanBase64 = cleanBase64.slice(1, -1);
+  }
+
+  // Decode base64 to binary data
+  const binaryString = atob(cleanBase64);
+
+  // Convert binary string to Uint8Array
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  // Create a Blob from the binary data
+  const blob = new Blob([bytes], { type: 'model/gltf-binary' });
+  
+  // Create a URL for the blob
+  const url = URL.createObjectURL(blob);
+  
+  return { blob, url };
+}
+
+// Usage with Three.js
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+const { url } = processGltfResponseToBlob(response.base64);
+const loader = new GLTFLoader();
+
+loader.load(url, (gltf) => {
+  scene.add(gltf.scene);
+  
+  // Clean up the blob URL when done
+  URL.revokeObjectURL(url);
+});
+
+// Usage with BabylonJS
+const { blob } = processGltfResponseToBlob(response.base64);
+BABYLON.SceneLoader.LoadAssetContainer(
+  "",
+  blob,
+  scene,
+  (container) => {
+    container.addAllToScene();
+  },
+  null,
+  null,
+  ".glb"
+);`}
+            </pre>
+          </TabsContent>
+        </Tabs>
 
         <div className="mt-6 rounded-md bg-blue-50 p-4">
           <div className="flex">
