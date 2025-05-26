@@ -26,8 +26,8 @@ export const API_CONFIG = {
   },
 
   // Authentication - no defaults for security
-  username: process.env.NEXT_PUBLIC_API_USERNAME || "",
-  password: process.env.NEXT_PUBLIC_API_PASSWORD || "",
+  username: process.env.API_USERNAME || "",
+  password: process.env.API_PASSWORD || "",
 
   // Maker configuration - customer specific
   maker: defaultMaker,
