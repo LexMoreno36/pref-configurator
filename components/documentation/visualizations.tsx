@@ -308,34 +308,42 @@ export function createModelUrlFromBase64(base64String: string) {
   })
 }
 
-// Usage with BabylonJS
-async function loadModel(modelGuid) {
+// Usage with PrefViewer
+async function loadModelWithPrefViewer(modelGuid) {
   try {
-    // Fetch the GLTF data
-    const base64Data = await fetchGltfModel(modelGuid, width, height)
+    // Fetch the GLTF data from the API
+    const base64Data = await fetchGltfModel(modelGuid)
     
     // Process the GLTF data to get a URL
     const { url, dispose } = await createModelUrlFromBase64(base64Data)
     
-    // Load the model in BabylonJS
-    BABYLON.SceneLoader.ImportMesh(
-      "",
-      "",
-      url,
-      scene,
-      (meshes) => {
-        // Model loaded successfully
-        console.log("Model loaded with", meshes.length, "meshes")
-        
-        // Important: Clean up the URL when done
-        dispose()
-      },
-      null,
-      (scene, message) => {
-        console.error("Error loading model:", message)
-        dispose()
-      }
-    )
+    // Get or create the pref-viewer element
+    const container = document.getElementById('model-container')
+    let viewer = container.querySelector('pref-viewer')
+    if (!viewer) {
+      viewer = document.createElement('pref-viewer')
+      viewer.style.width = '100%'
+      viewer.style.height = '100%'
+      container.appendChild(viewer)
+    }
+    
+    // Set the model URL
+    viewer.setAttribute('model', url)
+    
+    // Clean up the URL when the component is removed or updated
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && 
+            mutation.attributeName === 'model' && 
+            viewer.getAttribute('model') !== url) {
+          dispose()
+          observer.disconnect()
+        }
+      })
+    })
+    
+    observer.observe(viewer, { attributes: true })
+    
   } catch (error) {
     console.error("Failed to load 3D model:", error)
   }
@@ -352,8 +360,8 @@ async function loadModel(modelGuid) {
           <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
             <h4 className="text-md font-semibold text-gray-800">Installation</h4>
             <p className="mt-2 text-gray-600">
-              We recommend using our official PrefViewer component for displaying 3D models. It's a custom element that
-              wraps BabylonJS functionality for easy integration:
+              For displaying 3D models, use our official PrefViewer component. It's a custom element that provides an
+              easy-to-use interface for 3D visualization:
             </p>
             <pre className="mt-2 rounded bg-gray-900 p-3 text-sm text-white overflow-auto">
               {`npm install @preference-sl/pref-viewer@2.0.0`}
@@ -581,11 +589,11 @@ function ModelViewer({ modelGuid }) {
               <div className="mt-2 text-sm text-blue-700">
                 <ul className="list-disc pl-5 space-y-1">
                   <li>
-                    <strong>Use PrefViewer:</strong> We recommend using our{" "}
+                    <strong>Use PrefViewer:</strong> Use our{" "}
                     <a href="#pref-viewer" className="underline">
                       @preference-sl/pref-viewer
                     </a>{" "}
-                    component for 3D models
+                    component for displaying 3D models
                   </li>
                   <li>Cache visualizations to reduce API calls</li>
                   <li>Regenerate visualizations when configuration changes</li>
