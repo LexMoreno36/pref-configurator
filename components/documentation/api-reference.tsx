@@ -1,6 +1,18 @@
-import { Code } from "lucide-react"
+"use client"
+
+import { Code, Copy, Check } from "lucide-react"
+import { useState } from "react"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function ApiReference() {
+  const [copied, setCopied] = useState<string | null>(null)
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(type)
+    setTimeout(() => setCopied(null), 2000)
+  }
+
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -29,15 +41,37 @@ export function ApiReference() {
             <tbody className="bg-white divide-y divide-gray-200">
               <tr>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Main API</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <code>{`${process.env.NEXT_PUBLIC_BASE_URL}`}</code>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <code className="bg-gray-100 px-1 py-0.5 rounded">{API_CONFIG.baseUrl}</code>
+                    <button
+                      onClick={() => copyToClipboard(API_CONFIG.baseUrl, "main")}
+                      className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      title="Copy URL"
+                    >
+                      {copied === "main" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">Base URL for most API endpoints</td>
               </tr>
               <tr>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">PrefWeb</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <code>{`${process.env.NEXT_PUBLIC_BASE_URL}/prefweb`}</code>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <code className="bg-gray-100 px-1 py-0.5 rounded">{API_CONFIG.pwbBaseUrl}</code>
+                    <button
+                      onClick={() => copyToClipboard(API_CONFIG.pwbBaseUrl, "prefweb")}
+                      className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      title="Copy URL"
+                    >
+                      {copied === "prefweb" ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   Base URL for authentication, item creation, and image generation
@@ -45,10 +79,35 @@ export function ApiReference() {
               </tr>
               <tr>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">USD Service</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <code>{`${process.env.NEXT_PUBLIC_BASE_URL}:8012`}</code>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <code className="bg-gray-100 px-1 py-0.5 rounded">{API_CONFIG.usdServiceUrl}</code>
+                    <button
+                      onClick={() => copyToClipboard(API_CONFIG.usdServiceUrl, "usd")}
+                      className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      title="Copy URL"
+                    >
+                      {copied === "usd" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">Base URL for photorealistic rendering service</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cloud Model Service</td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <div className="flex items-center">
+                    <code className="bg-gray-100 px-1 py-0.5 rounded">{API_CONFIG.cloudModelServiceUrl}</code>
+                    <button
+                      onClick={() => copyToClipboard(API_CONFIG.cloudModelServiceUrl, "cloud")}
+                      className="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                      title="Copy URL"
+                    >
+                      {copied === "cloud" ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">Base URL for cloud model services</td>
               </tr>
             </tbody>
           </table>

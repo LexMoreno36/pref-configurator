@@ -1,5 +1,6 @@
 import { Database } from "lucide-react"
 import { EndpointCard } from "./endpoint-card"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function Models() {
   return (
@@ -23,7 +24,7 @@ export function Models() {
         <div className="mt-4 space-y-4">
           <EndpointCard
             method="GET"
-            endpoint="/models/codes"
+            endpoint={`${API_CONFIG.baseUrl}/prefweb/api/v1/items/codes`}
             description="Get a list of available window model codes"
             responseExample={{
               modelCodes: ["1_vent_1rail_OG", "2_vent_2rail_OG", "corner_window_90"],
@@ -33,16 +34,29 @@ export function Models() {
 
           <EndpointCard
             method="POST"
-            endpoint="/models"
+            endpoint={`${API_CONFIG.baseUrl}/prefweb/api/v1/items`}
             description="Create a new model instance"
             requestBody={{
-              modelCode: "1_vent_1rail_OG",
+              ModelCode: "1_vent_1rail_OG",
+              IsPersistable: true,
             }}
             responseExample={{
-              guid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-              modelCode: "1_vent_1rail_OG",
+              itemId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             }}
-            notes="The returned GUID is used to identify this specific model instance in all subsequent API calls. Store this GUID for the duration of the configuration session."
+            notes="The returned itemId is used to identify this specific model instance in all subsequent API calls. Store this ID for the duration of the configuration session."
+          />
+
+          <EndpointCard
+            method="GET"
+            endpoint={`${API_CONFIG.baseUrl}/prefweb/api/v1/items/{itemId}`}
+            description="Get details of a specific model instance"
+            responseExample={{
+              itemId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              modelCode: "1_vent_1rail_OG",
+              createdAt: "2023-05-15T10:30:45Z",
+              status: "active",
+            }}
+            notes="Use this endpoint to retrieve the current state and details of a model instance."
           />
         </div>
 

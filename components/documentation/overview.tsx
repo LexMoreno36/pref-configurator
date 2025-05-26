@@ -1,4 +1,5 @@
 import { ExternalLink, Database, Settings, Layers, ImageIcon } from "lucide-react"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function Overview() {
   return (
@@ -78,7 +79,7 @@ export function Overview() {
               <div className="mt-2 text-sm text-blue-700">
                 <p>All API endpoints are relative to the base URL:</p>
                 <code className="mt-1 block rounded bg-blue-100 px-2 py-1 font-mono text-blue-800">
-                  https://your-domain.com/api
+                  {API_CONFIG.baseUrl}
                 </code>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { ImageIcon } from "lucide-react"
 import { EndpointCard } from "./endpoint-card"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function Visualizations() {
   return (
@@ -24,12 +25,15 @@ export function Visualizations() {
         <div className="mt-4 space-y-4">
           <EndpointCard
             method="POST"
-            endpoint="/models/{guid}/images"
+            endpoint={`${API_CONFIG.baseUrl}/prefweb/api/v1/integration/sap/sales/items/{itemId}/get-image`}
             description="Generate a visualization of the configured model"
             requestBody={{
               imageType: 5, // 5 for SVG, 11 for GLTF (3D)
               width: 800,
               height: 600,
+              units: 0,
+              usePrefOne: true,
+              visualPropertiesXML: "",
             }}
             responseExample={{
               base64: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIj4...",
@@ -39,13 +43,34 @@ export function Visualizations() {
 
           <EndpointCard
             method="POST"
-            endpoint="/png-images"
-            description="Generate photorealistic PNG images of the configured model"
+            endpoint={`${API_CONFIG.baseUrl}:8012/usd-service/v1/Session/New`}
+            description="Create a new USD service session for photorealistic rendering"
             requestBody={{
-              guid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              system: API_CONFIG.system,
+              itemId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             }}
             responseExample={{
-              images: ["http://example.com/images/view1.png", "http://example.com/images/view2.png"],
+              sessionId: "session-12345",
+              status: "ready",
+            }}
+            notes="Create a session before requesting photorealistic PNG images. The session ID is used in subsequent requests."
+          />
+
+          <EndpointCard
+            method="GET"
+            endpoint={`${API_CONFIG.baseUrl}:8012/usd-service/v1/Images?sessionId={sessionId}`}
+            description="Generate photorealistic PNG images of the configured model"
+            responseExample={{
+              images: [
+                {
+                  url: "http://example.com/images/view1.png",
+                  angle: "front",
+                },
+                {
+                  url: "http://example.com/images/view2.png",
+                  angle: "perspective",
+                },
+              ],
             }}
             notes="The response contains an array of URLs to photorealistic PNG images of the configured model from different angles."
           />

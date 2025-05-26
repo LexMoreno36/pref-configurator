@@ -1,5 +1,6 @@
-import { Key } from "lucide-react"
+import { Lock } from "lucide-react"
 import { EndpointCard } from "./endpoint-card"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function Authentication() {
   return (
@@ -7,16 +8,15 @@ export function Authentication() {
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-900">Authentication</h2>
         <p className="mt-2 text-gray-600">
-          The Window Configurator API uses OAuth 2.0 for authentication. You need to obtain an access token before
-          making any API calls.
+          The Authentication API allows you to obtain access tokens for making authenticated requests to the API.
         </p>
 
         <h3 className="mt-6 text-lg font-semibold text-gray-800">Authentication Flow</h3>
         <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
           <ol className="list-decimal pl-5 space-y-2 text-gray-700">
             <li>Request an access token using your API credentials</li>
-            <li>Include the token in the Authorization header of all subsequent requests</li>
-            <li>Monitor token expiration and refresh as needed</li>
+            <li>Include the access token in the Authorization header of subsequent API requests</li>
+            <li>Refresh the token when it expires</li>
           </ol>
         </div>
 
@@ -24,44 +24,53 @@ export function Authentication() {
         <div className="mt-4 space-y-4">
           <EndpointCard
             method="POST"
-            endpoint="/prefweb/token"
-            description="Get an OAuth token for authenticating API requests"
+            endpoint={`${API_CONFIG.baseUrl}/prefweb/token`}
+            description="Get an access token"
             requestBody={{
               grant_type: "password",
-              username: "your_api_username",
-              password: "your_api_password",
+              username: API_CONFIG.username,
+              password: API_CONFIG.password,
             }}
             responseExample={{
               access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
               token_type: "Bearer",
               expires_in: 3600,
-              userName: "your_username",
-              ".issued": "2024-05-26T12:00:00Z",
-              ".expires": "2024-05-26T13:00:00Z",
+              refresh_token: "def50200641f3e1...",
             }}
-            notes="The token is valid for the number of seconds specified in the expires_in field. Store this token and use it for all subsequent API requests."
+            notes="The access token is valid for the specified number of seconds (expires_in). You should refresh the token before it expires."
           />
         </div>
 
-        <h3 className="mt-6 text-lg font-semibold text-gray-800">Using the Token</h3>
-        <p className="mt-2 text-gray-600">Include the token in the Authorization header of all API requests:</p>
+        <h3 className="mt-6 text-lg font-semibold text-gray-800">Using the Access Token</h3>
+        <p className="mt-2 text-gray-600">Include the access token in the Authorization header of all API requests:</p>
 
         <pre className="mt-4 rounded bg-gray-900 p-3 text-sm text-white overflow-auto">
-          {`Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
+          {`// Example: Including the access token in a fetch request
+fetch('${API_CONFIG.baseUrl}/prefweb/api/v1/items', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+  },
+  body: JSON.stringify({
+    ModelCode: '1_vent_1rail_OG',
+    IsPersistable: true
+  })
+})`}
         </pre>
 
-        <div className="mt-6 rounded-md bg-blue-50 p-4">
+        <div className="mt-6 rounded-md bg-yellow-50 p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <Key className="h-5 w-5 text-blue-400" />
+              <Lock className="h-5 w-5 text-yellow-400" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">Security Best Practices</h3>
-              <div className="mt-2 text-sm text-blue-700">
+              <h3 className="text-sm font-medium text-yellow-800">Security Best Practices</h3>
+              <div className="mt-2 text-sm text-yellow-700">
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Store API credentials securely and never expose them in client-side code</li>
-                  <li>Implement token refresh logic to handle token expiration</li>
-                  <li>Use HTTPS for all API communications</li>
+                  <li>Implement token refresh logic to maintain uninterrupted access</li>
+                  <li>Use HTTPS for all API requests to ensure data is encrypted in transit</li>
                   <li>Implement proper error handling for authentication failures</li>
                 </ul>
               </div>

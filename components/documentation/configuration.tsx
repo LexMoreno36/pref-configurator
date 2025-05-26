@@ -1,7 +1,19 @@
 import { Settings } from "lucide-react"
 import { EndpointCard } from "./endpoint-card"
+import { API_CONFIG } from "@/lib/api/constants"
 
 export function Configuration() {
+  // Create a well-formatted XML command for the example
+  const xmlCommand = `<Commands>
+  <cmd:Command name='Model.SetOptionValue' xmlns:cmd='http://www.preference.com/XMLSchemas/2006/PrefCAD.Command'>
+    <cmd:Parameter name='name' type='string' value='${API_CONFIG.makerPrefix}INNER_COLOR' />
+    <cmd:Parameter name='value' type='string' value='${API_CONFIG.makerPrefix}45_9T10' />
+    <cmd:Parameter name='regenerate' type='bool' value='0' />
+    <cmd:Parameter name='sendEvents' type='bool' value='1' />
+    <cmd:Parameter name='applyAllBinded' type='bool' value='1' />
+  </cmd:Command>
+</Commands>`
+
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -25,7 +37,7 @@ export function Configuration() {
         <div className="mt-4 space-y-4">
           <EndpointCard
             method="GET"
-            endpoint="/configurator/{modelId}"
+            endpoint={`${API_CONFIG.baseUrl}/Cloud.ModelService/api/v1/Options/model?modelId={modelId}`}
             description="Get the configuration options for a specific model"
             responseExample={{
               Name: "window_configuration",
@@ -51,17 +63,51 @@ export function Configuration() {
 
           <EndpointCard
             method="POST"
-            endpoint="/models/{guid}/options"
+            endpoint={`${API_CONFIG.baseUrl}/erp.hydrawebapi.service/v1/prefItems/{itemId}/ExecuteCommand`}
             description="Update a configuration option"
             requestBody={{
-              name: "preference~OUTER_COLOR",
-              value: "preference~7016",
+              command: xmlCommand,
             }}
             responseExample={{
               success: true,
-              message: "Option preference~OUTER_COLOR updated to preference~7016",
+              message: "Option updated successfully",
             }}
             notes="When updating an option, the response indicates success. You should then refresh the configuration to see any dependent changes."
+          />
+
+          <EndpointCard
+            method="POST"
+            endpoint={`${API_CONFIG.baseUrl}/KB.UIConfigurator.Service/api/v1/makers/${API_CONFIG.maker}/process-options/${API_CONFIG.uiDefinitionName}`}
+            description="Process options to get UI definition"
+            requestBody={{
+              options: [
+                {
+                  Code: `${API_CONFIG.makerPrefix}INNER_COLOR`,
+                  ValueString: `${API_CONFIG.makerPrefix}45_9T10`,
+                  Type: "Color",
+                },
+              ],
+            }}
+            responseExample={{
+              tabs: [
+                {
+                  name: "Appearance",
+                  sections: [
+                    {
+                      name: "Colors",
+                      options: [
+                        {
+                          code: `${API_CONFIG.makerPrefix}INNER_COLOR`,
+                          widget: "ColorPicker",
+                          values: ["9010", "7016", "45_9T10"],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            }}
+            notes={`This endpoint processes the raw options and returns a UI-friendly structure with tabs, sections, and widgets for the ${API_CONFIG.makerCapitalized} maker.`}
           />
         </div>
 

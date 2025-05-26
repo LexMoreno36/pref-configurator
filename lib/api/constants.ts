@@ -1,5 +1,5 @@
 // Get base URL from environment variable or use default
-const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pfreydemo.prefnet.net/qa-reynaers"
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://reydemo.prefnet.net/qa-reynaers"
 
 // API configuration with dynamic base URL
 export const API_CONFIG = {
