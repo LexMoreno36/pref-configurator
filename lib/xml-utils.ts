@@ -86,21 +86,29 @@ export function createGetDimensionsCommand(): string {
 }
 
 /**
+ * Apply maker-specific prefix to option name or value
+ * @param value The option name or value to prefix
+ * @param makerPrefix The maker-specific prefix (e.g., "RY_" for Reynaers)
+ * @returns The prefixed value
+ */
+export function applyMakerPrefix(value: string, makerPrefix: string): string {
+  // If the value already has a prefix (contains ~), extract the actual value
+  const extractedValue = value.includes("~") ? value.split("~")[1] : value
+
+  // Apply the maker-specific prefix
+  return `${makerPrefix}${extractedValue}`
+}
+
+/**
  * Create XML command for setting option values
  * @param optionName The option name
  * @param optionValue The option value
  * @returns XML command string for the SetOptionsValues command
  */
 export function createSetOptionValueCommand(optionName: string, optionValue: string): string {
-  // Extract the actual option name from the format (e.g., "preference~OUTER_COLOR" -> "OUTER_COLOR")
-  const extractedName = optionName.includes("~") ? optionName.split("~")[1] : optionName
-
-  // Extract the actual option value without the prefix (e.g., "reynaers~49_7T39" -> "49_7T39")
-  const extractedValue = optionValue.includes("~") ? optionValue.split("~")[1] : optionValue
-
-  // Apply maker-specific prefix to both name and value (configurable per maker)
-  const prefixedName = `${API_CONFIG.makerPrefix}${extractedName}`
-  const prefixedValue = `${API_CONFIG.makerPrefix}${extractedValue}`
+  // Apply maker-specific prefix to both name and value
+  const prefixedName = applyMakerPrefix(optionName, API_CONFIG.makerPrefix)
+  const prefixedValue = applyMakerPrefix(optionValue, API_CONFIG.makerPrefix)
 
   return `
         <cmd:Commands xmlns:cmd="http://www.preference.com/XMLSchemas/2006/PrefCAD.Command">
