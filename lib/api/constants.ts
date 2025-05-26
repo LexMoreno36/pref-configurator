@@ -8,6 +8,9 @@ const capitalize = (str: string): string => {
 const defaultMaker = process.env.NEXT_PUBLIC_DEFAULT_MAKER || ""
 const makerCapitalized = process.env.NEXT_PUBLIC_MAKER_CAPITALIZED || capitalize(defaultMaker)
 
+// Check if code is running on the server
+const isServer = typeof window === "undefined"
+
 // API configuration with environment variables
 export const API_CONFIG = {
   // Base URLs - no defaults, must be provided via env vars
@@ -25,9 +28,24 @@ export const API_CONFIG = {
     return this.baseUrl ? `${this.baseUrl}/Cloud.ModelService` : ""
   },
 
-  // Authentication - no defaults for security
-  username: process.env.NEXT_PUBLIC_API_USERNAME || "",
-  password: process.env.NEXT_PUBLIC_API_PASSWORD || "",
+  // Authentication - server-side only, no NEXT_PUBLIC prefix
+  // These will only be available in server components, API routes, etc.
+  get username() {
+    // Only access these variables on the server
+    if (isServer) {
+      return process.env.API_USERNAME || ""
+    }
+    // Return empty string on client to prevent errors
+    return ""
+  },
+  get password() {
+    // Only access these variables on the server
+    if (isServer) {
+      return process.env.API_PASSWORD || ""
+    }
+    // Return empty string on client to prevent errors
+    return ""
+  },
 
   // Maker configuration - customer specific
   maker: defaultMaker,
@@ -40,6 +58,9 @@ export const API_CONFIG = {
 
   // System parameters - customer specific
   system: process.env.NEXT_PUBLIC_DEFAULT_SYSTEM || "",
+
+  // Feature flags
+  useMockData: process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true",
 }
 
 // API Endpoints - centralized endpoint definitions
@@ -122,11 +143,15 @@ export function buildUrl(baseUrl: string, params?: Record<string, string | numbe
 }
 
 // Validate required environment variables
-export function validateEnvironment(): { valid: boolean; missing: string[] } {
-  const requiredVars = [
+export function validateEnvironment(): {
+  valid: boolean
+  missing: string[]
+  clientMissing: string[]
+  serverMissing: string[]
+} {
+  // Variables required on both client and server
+  const clientRequiredVars = [
     "NEXT_PUBLIC_BASE_URL",
-    "NEXT_PUBLIC_API_USERNAME",
-    "NEXT_PUBLIC_API_PASSWORD",
     "NEXT_PUBLIC_DEFAULT_MAKER",
     "NEXT_PUBLIC_MAKER_PREFIX",
     "NEXT_PUBLIC_DEFAULT_SYSTEM",
@@ -134,10 +159,33 @@ export function validateEnvironment(): { valid: boolean; missing: string[] } {
     "NEXT_PUBLIC_OPTION_LIST_NAME",
   ]
 
-  const missing = requiredVars.filter((varName) => !process.env[varName])
+  // Variables required only on the server
+  const serverRequiredVars = ["API_USERNAME", "API_PASSWORD"]
+
+  // Check client variables
+  const clientMissing = clientRequiredVars.filter((varName) => !process.env[varName])
+
+  // Check server variables only when running on the server
+  const serverMissing = isServer ? serverRequiredVars.filter((varName) => !process.env[varName]) : []
+
+  // Combine all missing variables
+  const missing = [...clientMissing, ...serverMissing]
 
   return {
     valid: missing.length === 0,
     missing,
+    clientMissing,
+    serverMissing,
   }
+}
+
+// Helper to check if we have valid authentication credentials
+// Only call this on the server!
+export function hasValidAuthCredentials(): boolean {
+  if (!isServer) {
+    console.warn("Auth credentials check attempted on client side")
+    return false
+  }
+
+  return Boolean(process.env.API_USERNAME && process.env.API_PASSWORD)
 }

@@ -10,6 +10,7 @@ import { CuboidIcon as Cube3D, SquareStack, CameraIcon } from "lucide-react"
 import { fetchSvgImage, fetchGltfModel } from "@/lib/api-service"
 import { processSvgResponseToString } from "@/lib/svg-utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ErrorDisplay } from "@/components/ui/error-display"
 
 /**
  * WindowPreview Component
@@ -24,6 +25,7 @@ export function WindowPreview() {
   const [viewMode, setViewMode] = useState<"2D" | "3D" | "PNG">("3D") // Set 3D as default
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errorType, setErrorType] = useState<"auth" | "network" | "server" | "config" | "unknown">("unknown")
 
   // Data for each view mode
   const [svgContent, setSvgContent] = useState<string | null>(null)
@@ -85,6 +87,7 @@ export function WindowPreview() {
   async function loadData(guid: string) {
     setIsLoading(true)
     setError(null)
+    setErrorType("unknown")
 
     try {
       const container = containerRef.current
@@ -93,37 +96,80 @@ export function WindowPreview() {
 
       // Fetch data based on view mode
       if (viewMode === "2D") {
-        const svgBase64 = await fetchSvgImage(guid, width, height)
-        const svgString = processSvgResponseToString(svgBase64)
-        if (svgString) {
-          setSvgContent(svgString)
-          needsFetchRef.current["2D"] = false
-        } else {
-          throw new Error("Failed to decode SVG")
+        try {
+          const svgBase64 = await fetchSvgImage(guid, width, height)
+          const svgString = processSvgResponseToString(svgBase64)
+          if (svgString) {
+            setSvgContent(svgString)
+            needsFetchRef.current["2D"] = false
+          } else {
+            throw new Error("Failed to decode SVG")
+          }
+        } catch (err) {
+          // Determine error type
+          const errorMessage = err instanceof Error ? err.message : String(err)
+          if (errorMessage.includes("Authentication failed") || errorMessage.includes("Unauthorized")) {
+            setErrorType("auth")
+          } else if (errorMessage.includes("Failed to fetch") || errorMessage.includes("Network error")) {
+            setErrorType("network")
+          } else if (errorMessage.includes("500")) {
+            setErrorType("server")
+          }
+          throw err
         }
       } else if (viewMode === "3D") {
-        const base64Data = await fetchGltfModel(guid, width, height)
-        setGltfBase64(base64Data)
-        needsFetchRef.current["3D"] = false
+        try {
+          const base64Data = await fetchGltfModel(guid, width, height)
+          setGltfBase64(base64Data)
+          needsFetchRef.current["3D"] = false
+        } catch (err) {
+          // Determine error type
+          const errorMessage = err instanceof Error ? err.message : String(err)
+          if (errorMessage.includes("Authentication failed") || errorMessage.includes("Unauthorized")) {
+            setErrorType("auth")
+          } else if (errorMessage.includes("Failed to fetch") || errorMessage.includes("Network error")) {
+            setErrorType("network")
+          } else if (errorMessage.includes("500")) {
+            setErrorType("server")
+          }
+          throw err
+        }
       } else if (viewMode === "PNG") {
         // Fetch PNG images
-        const response = await fetch("/api/png-images", {
-          method: "POST",
-          headers: {
-            accept: "*/*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ guid }),
-        })
+        try {
+          const response = await fetch("/api/png-images", {
+            method: "POST",
+            headers: {
+              accept: "*/*",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ guid }),
+          })
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch PNG images")
+          if (!response.ok) {
+            // Determine error type based on status code
+            if (response.status === 401 || response.status === 403) {
+              setErrorType("auth")
+            } else if (response.status >= 500) {
+              setErrorType("server")
+            }
+            throw new Error(`Failed to fetch PNG images: ${response.statusText}`)
+          }
+
+          const data = await response.json()
+          const images = Array.isArray(data.images) ? data.images : []
+          setPngImages(images)
+          needsFetchRef.current["PNG"] = false
+        } catch (err) {
+          // Determine error type if not already set
+          if (errorType === "unknown") {
+            const errorMessage = err instanceof Error ? err.message : String(err)
+            if (errorMessage.includes("Failed to fetch") || errorMessage.includes("Network error")) {
+              setErrorType("network")
+            }
+          }
+          throw err
         }
-
-        const data = await response.json()
-        const images = Array.isArray(data.images) ? data.images : []
-        setPngImages(images)
-        needsFetchRef.current["PNG"] = false
       }
     } catch (err) {
       console.error(`Failed to load ${viewMode} view:`, err)
@@ -136,6 +182,15 @@ export function WindowPreview() {
   // Handle view mode change
   const handleViewModeChange = (mode: "2D" | "3D" | "PNG") => {
     setViewMode(mode)
+  }
+
+  // Handle retry
+  const handleRetry = () => {
+    if (modelGuid) {
+      setError(null)
+      needsFetchRef.current[viewMode] = true
+      loadData(modelGuid)
+    }
   }
 
   return (
@@ -206,7 +261,7 @@ export function WindowPreview() {
             </TooltipProvider>
           </div>
 
-          {/* Loading and error states */}
+          {/* Loading state */}
           {(isLoading || isModelLoading) && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white">
               <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-orange-500"></div>
@@ -216,26 +271,28 @@ export function WindowPreview() {
             </div>
           )}
 
+          {/* Error state - using our new ErrorDisplay component */}
           {error && !isLoading && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <p className="text-base font-medium text-red-500">Failed to load window preview</p>
-              <p className="mt-2 text-sm text-gray-500">{error}</p>
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white p-6">
+              <ErrorDisplay
+                error={error}
+                type={errorType}
+                title={`Failed to load ${viewMode} view`}
+                onRetry={handleRetry}
+                className="max-w-md"
+              />
+
+              {/* Additional guidance for specific error types */}
+              {errorType === "auth" && (
+                <div className="mt-4 max-w-md text-center text-sm text-gray-600">
+                  <p>This error typically occurs when the API credentials are incorrect or missing.</p>
+                  <p className="mt-2">Please check your environment variables:</p>
+                  <ul className="mt-1 list-disc pl-6 text-left">
+                    <li>API_USERNAME</li>
+                    <li>API_PASSWORD</li>
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
