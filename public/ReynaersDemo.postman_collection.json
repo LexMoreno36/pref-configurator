@@ -1,0 +1,458 @@
+{
+  "info": {
+    "_postman_id": "d4747a46-a541-424f-b12d-7fc2a7d98957",
+    "name": "ReynaersDemo",
+    "description": "This Postman collection is used for interacting with the Preference configuration APIs and the photorealistic rendering. It includes authentication, item creation, option handling, image rendering, and session management requests used to simulate and configure product models.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "20926932"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var responseJson = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"current_access_token\", responseJson.access_token);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{api_username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{api_password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/prefweb/token",
+              "host": ["{{base_url}}"],
+              "path": ["prefweb", "token"]
+            },
+            "description": "### Get oAuth Token (POST)\n\nThis endpoint is used to retrieve an OAuth token for authenticating API requests.\n\n#### Request\n\n- **Method**: POST\n    \n- **URL**: `{{BASE_URL}}/token`\n    \n- **Request Body** (application/x-www-form-urlencoded):\n    \n    - **grant_type** (required, text): The type of OAuth grant being requested (e.g., \"password\" for direct authentication).\n        \n    - **username** (required, text): The username for authentication.\n        \n    - **password** (required, text): The password for authentication.\n        \n\n#### Response\n\n- **Status Code**: 200 (OK)\n    \n- **Content-Type**: text/xml\n    \n- **Body**: The response will contain an XML-formatted message with the following structure:\n    \n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"access_token\": { \"type\": \"string\" },\n    \"token_type\": { \"type\": \"string\" },\n    \"expires_in\": { \"type\": \"integer\" },\n    \"userName\": { \"type\": \"string\" },\n    \".issued\": { \"type\": \"string\" },\n    \".expires\": { \"type\": \"string\" }\n  }\n}\n\n ```\n\n- **Fields**:\n    \n    - **access_token**: The token that will be used for authenticating further API requests.\n        \n    - **token_type**: The type of the token, typically \"Bearer\".\n        \n    - **expires_in**: The time in seconds until the token expires.\n        \n    - **userName**: The username associated with the token.\n        \n    - **.issued**: The timestamp of when the token was issued.\n        \n    - **.expires**: The timestamp of when the token will expire.\n        \n\n#### Example Response:\n\n``` xml\n<response>\n    <access_token>your_access_token</access_token>\n    <token_type>Bearer</token_type>\n    <expires_in>3600</expires_in>\n    <userName>your_username</userName>\n    <.issued>2024-11-07T12:00:00Z\n    <.expires>2024-11-07T13:00:00Z\n</response>\n\n ```"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Items",
+      "item": [
+        {
+          "name": "CreateItem",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let itemId = response.itemId;\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"item_id\", itemId);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{current_access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"ModelCode\": \"1_vent_1rail_OG\",\n    \"IsPersistable\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/prefweb/api/v1/items",
+              "host": ["{{base_url}}"],
+              "path": ["prefweb", "api", "v1", "items"]
+            },
+            "description": "Creates a new item by providing a model code.\nOptionally, a presettings name can be provided"
+          },
+          "response": []
+        },
+        {
+          "name": "ExecuteItemCommands",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\"<Commands><cmd:Command name='Model.SetOptionValue' xmlns:cmd='http://www.preference.com/XMLSchemas/2006/PrefCAD.Command'><cmd:Parameter name='name' type='string' value='RY_INNER_COLOR' /><cmd:Parameter name='value' type='string' value='RY_45_9T10' /><cmd:Parameter name='regenerate' type='bool' value='0' /><cmd:Parameter name='sendEvents' type='bool' value='1' /><cmd:Parameter name='applyAllBinded' type='bool' value='1' /></cmd:Command></Commands>\"\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/erp.hydrawebapi.Service/v1/prefItems/{{item_id}}/executecommand",
+              "host": ["{{base_url}}"],
+              "path": ["erp.hydrawebapi.Service", "v1", "prefItems", "{{item_id}}", "executecommand"]
+            },
+            "description": "Execute commands for the given item"
+          },
+          "response": []
+        },
+        {
+          "name": "GetImage",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{current_access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"imageType\": 5,\r\n  \"width\": 500,\r\n  \"height\": 500,\r\n  \"units\": 0,\r\n  \"usePrefOne\": true,\r\n  \"visualPropertiesXML\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/prefweb/api/v1/integration/sap/sales/items/{{item_id}}/get-image",
+              "host": ["{{base_url}}"],
+              "path": ["prefweb", "api", "v1", "integration", "sap", "sales", "items", "{{item_id}}", "get-image"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Options",
+      "item": [
+        {
+          "name": "GetItemOptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cloud.modelservice/api/v1/options/model?modelId={{item_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["cloud.modelservice", "api", "v1", "options", "model"],
+              "query": [
+                {
+                  "key": "modelId",
+                  "value": "{{item_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetUIDefinition",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// fill with what we obtain from GetItemOptions",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/kb.uiconfigurator.service/api/v1/makers/{{maker}}/process-options/{{ui_definition}}",
+              "host": ["{{base_url}}"],
+              "path": [
+                "kb.uiconfigurator.service",
+                "api",
+                "v1",
+                "makers",
+                "{{maker}}",
+                "process-options",
+                "{{ui_definition}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Extra",
+      "item": [
+        {
+          "name": "GetAllItemCodes",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{current_access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/prefweb/api/v1/items/codes?pagenumber=1&pagesize=10",
+              "host": ["{{base_url}}"],
+              "path": ["prefweb", "api", "v1", "items", "codes"],
+              "query": [
+                {
+                  "key": "entityId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "pagenumber",
+                  "value": "1"
+                },
+                {
+                  "key": "pagesize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Photorealistic Rendering",
+      "item": [
+        {
+          "name": "GetSessionId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let sessionId = response.session_id;\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"pr_session_id\", sessionId);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://reydemo.prefnet.net:8012/usd-service/v1/session/new",
+              "protocol": "http",
+              "host": ["reydemo", "prefnet", "net"],
+              "port": "8012",
+              "path": ["usd-service", "v1", "session", "new"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetOmniverseImages",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"models\": [\r\n        {\r\n        \"filePathsOrGuids\": \"{{item_id}}\",\r\n        \"maker\": \"{{maker}}\",\r\n        \"system\": \"{{system}}\",\r\n        \"generateWall\": true\r\n        }\r\n  ],\r\n  \"quality\": [\r\n    \"low\"\r\n  ],\r\n  \"resolution\": [\r\n    \"HD\"\r\n  ],\r\n  \"cameras\": [\r\n    \"Camera_Inner_01\", \"Camera_Outer_01\"\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://reydemo.prefnet.net:8012/usd-service/v1/images?sessionid={{pr_session_id}}",
+              "protocol": "http",
+              "host": ["reydemo", "prefnet", "net"],
+              "port": "8012",
+              "path": ["usd-service", "v1", "images"],
+              "query": [
+                {
+                  "key": "sessionid",
+                  "value": "{{pr_session_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://reydemo.prefnet.net/qa-reynaers",
+      "type": "string"
+    },
+    {
+      "key": "api_username",
+      "value": "example@preference.com",
+      "type": "string"
+    },
+    {
+      "key": "api_password",
+      "value": "your_secure_password",
+      "type": "string"
+    },
+    {
+      "key": "maker",
+      "value": "reynaers",
+      "type": "string"
+    },
+    {
+      "key": "system",
+      "value": "masterpatio",
+      "type": "string"
+    },
+    {
+      "key": "ui_definition",
+      "value": "uidefinition",
+      "type": "string"
+    },
+    {
+      "key": "item_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "current_access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pr_session_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

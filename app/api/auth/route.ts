@@ -58,6 +58,11 @@ async function fetchNewToken(): Promise<{
   accessToken: string
   expiresIn: number
 }> {
+  // Check if environment variables are set
+  if (!API_CONFIG.username || !API_CONFIG.password) {
+    throw new Error("API credentials are not configured. Please set the environment variables.")
+  }
+
   const formData = new URLSearchParams({
     grant_type: "password",
     username: API_CONFIG.username,
