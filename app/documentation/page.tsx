@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   FileText,
@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Key,
   Monitor,
+  BookOpen,
 } from "lucide-react"
 import { Overview } from "@/components/documentation/overview"
 import { Models } from "@/components/documentation/models"
@@ -26,10 +27,20 @@ import { Integration } from "@/components/documentation/integration"
 import { Authentication } from "@/components/documentation/authentication"
 import { ApiReference } from "@/components/documentation/api-reference"
 import { Photorealistic } from "@/components/documentation/photorealistic"
+import { PostmanCollection } from "@/components/documentation/postman-collection"
+import { PostmanGuide } from "@/components/documentation/postman-guide"
 
 export default function DocumentationPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeSection, setActiveSection] = useState<string>("overview")
+
+  useEffect(() => {
+    const section = searchParams?.get("section")
+    if (section) {
+      setActiveSection(section)
+    }
+  }, [searchParams])
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -134,6 +145,18 @@ export default function DocumentationPage() {
                   active={activeSection === "api-reference"}
                   onClick={() => setActiveSection("api-reference")}
                 />
+                <NavItem
+                  icon={<BookOpen className="h-4 w-4" />}
+                  title="Postman Collection"
+                  active={activeSection === "postman-collection"}
+                  onClick={() => setActiveSection("postman-collection")}
+                />
+                <NavItem
+                  icon={<BookOpen className="h-4 w-4" />}
+                  title="Postman Guide"
+                  active={activeSection === "postman-guide"}
+                  onClick={() => setActiveSection("postman-guide")}
+                />
               </nav>
             </div>
           </div>
@@ -149,6 +172,8 @@ export default function DocumentationPage() {
             {activeSection === "photorealistic" && <Photorealistic />}
             {activeSection === "integration" && <Integration />}
             {activeSection === "api-reference" && <ApiReference />}
+            {activeSection === "postman-collection" && <PostmanCollection />}
+            {activeSection === "postman-guide" && <PostmanGuide />}
           </div>
         </div>
       </main>
