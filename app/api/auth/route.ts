@@ -2,8 +2,9 @@ export const runtime = "nodejs"
 
 import type { NextRequest } from "next/server"
 import { fetch, Agent } from "undici"
-import { API_CONFIG } from "@/lib/api/constants"
+import { API_ENDPOINTS } from "@/lib/api/constants"
 import { corsResponse, corsErrorResponse, handleCorsOptions, logApiCall } from "@/lib/api/utils"
+import { API_CONFIG } from "@/lib/api/config" // Declare API_CONFIG import
 
 interface TokenResponse {
   access_token: string
@@ -64,8 +65,7 @@ async function fetchNewToken(): Promise<{
     password: API_CONFIG.password,
   })
 
-  // Use pwbBaseUrl for token endpoint
-  const url = `${API_CONFIG.pwbBaseUrl}/token`
+  const url = API_ENDPOINTS.auth.token()
   logApiCall("POST", url)
 
   // Use Undici's Agent to disable cert validation (only for dev/local)

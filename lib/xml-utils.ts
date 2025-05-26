@@ -1,3 +1,5 @@
+import { API_CONFIG } from "@/lib/api/constants"
+
 /**
  * Parse XML string to extract the value of the <cmd:Parameter name="result" …/>
  * Automatically unquotes a JSON-encoded XML string (the leading/trailing '"' and '\\"'s).
@@ -96,11 +98,15 @@ export function createSetOptionValueCommand(optionName: string, optionValue: str
   // Extract the actual option value without the prefix (e.g., "reynaers~49_7T39" -> "49_7T39")
   const extractedValue = optionValue.includes("~") ? optionValue.split("~")[1] : optionValue
 
+  // Apply maker-specific prefix to both name and value (configurable per maker)
+  const prefixedName = `${API_CONFIG.makerPrefix}${extractedName}`
+  const prefixedValue = `${API_CONFIG.makerPrefix}${extractedValue}`
+
   return `
         <cmd:Commands xmlns:cmd="http://www.preference.com/XMLSchemas/2006/PrefCAD.Command">
             <cmd:Command name="Model.SetOptionValue">
-                <cmd:Parameter name="name" type="string" value="RY_${extractedName}" />
-                <cmd:Parameter name="value" type="string" value="RY_${extractedValue}" />
+                <cmd:Parameter name="name" type="string" value="${prefixedName}" />
+                <cmd:Parameter name="value" type="string" value="${prefixedValue}" />
                 <cmd:Parameter name="regenerate" type="bool" value="1" />
                 <cmd:Parameter name="sendEvents" type="bool" value="1" />
                 <cmd:Parameter name="applyAllBinded" type="bool" value="1" />

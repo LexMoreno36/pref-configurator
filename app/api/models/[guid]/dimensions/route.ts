@@ -1,7 +1,7 @@
 export const runtime = "nodejs"
 
 import type { NextRequest } from "next/server"
-import { API_CONFIG } from "@/lib/api/constants"
+import { API_ENDPOINTS } from "@/lib/api/constants"
 import { corsResponse, corsErrorResponse, logApiCall, handleCorsOptions } from "@/lib/api/utils"
 import {
   parseCommandResultValue,
@@ -29,9 +29,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       connect: { rejectUnauthorized: false },
     })
 
-    // Execute the GetDimensions command with the correct body format
-    // Note: Using baseUrl for erp.hydrawebapi.service and no auth
-    const url = `${API_CONFIG.baseUrl}/erp.hydrawebapi.service/v1/prefItems/${guid}/ExecuteCommand`
+    const url = API_ENDPOINTS.models.dimensions(guid)
     const commandXml = createGetDimensionsCommand()
 
     logApiCall("POST", url)
@@ -42,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(commandXml), // Direct stringify of the command XML
+      body: JSON.stringify(commandXml),
     })
 
     if (!response.ok) {
@@ -89,12 +87,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       connect: { rejectUnauthorized: false },
     })
 
-    // Create the SetDimensionValue command with the correct format
-    // The function now handles extracting the name and subDimensionIndex from the dimension name
     const commandXml = createSetDimensionValueCommand(name, value)
+    const url = API_ENDPOINTS.models.dimensions(guid)
 
-    // Note: Using baseUrl for erp.hydrawebapi.service and no auth
-    const url = `${API_CONFIG.baseUrl}/erp.hydrawebapi.service/v1/prefItems/${guid}/ExecuteCommand`
     logApiCall("POST", url)
 
     const response = await undiciFetch(url, {
@@ -103,7 +98,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(commandXml), // Direct stringify of the command XML
+      body: JSON.stringify(commandXml),
     })
 
     if (!response.ok) {
@@ -112,7 +107,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return corsErrorResponse(`Set dimension failed: ${response.status} ${errorText}`, response.status)
     }
 
-    // Get the updated dimensions with the correct format
+    // Get the updated dimensions
     const getDimensionsXml = createGetDimensionsCommand()
 
     const getDimensionsResponse = await undiciFetch(url, {
@@ -121,7 +116,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(getDimensionsXml), // Direct stringify of the command XML
+      body: JSON.stringify(getDimensionsXml),
     })
 
     if (!getDimensionsResponse.ok) {

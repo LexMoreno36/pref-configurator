@@ -1,7 +1,7 @@
 export const runtime = "nodejs"
 
 import type { NextRequest } from "next/server"
-import { API_CONFIG, ImageType, CORS_HEADERS } from "@/lib/api/constants"
+import { API_ENDPOINTS, ImageType, CORS_HEADERS } from "@/lib/api/constants"
 import { corsErrorResponse, logApiCall, handleCorsOptions } from "@/lib/api/utils"
 import { NextResponse } from "next/server"
 import { fetch as undiciFetch, Agent } from "undici"
@@ -33,8 +33,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       connect: { rejectUnauthorized: false },
     })
 
-    // Use pwbBaseUrl for integration/sap/sales/items endpoint
-    const url = `${API_CONFIG.pwbBaseUrl}/api/v1/integration/sap/sales/items/${guid}/get-image`
+    const url = API_ENDPOINTS.models.images(guid)
     logApiCall("POST", url)
 
     const response = await undiciFetch(url, {

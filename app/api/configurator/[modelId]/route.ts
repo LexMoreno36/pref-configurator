@@ -3,7 +3,7 @@ export const runtime = "nodejs"
 import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import { mockData } from "@/lib/mock-data"
-import { API_CONFIG, CORS_HEADERS } from "@/lib/api/constants"
+import { API_ENDPOINTS, CORS_HEADERS } from "@/lib/api/constants"
 import { logApiCall, handleCorsOptions } from "@/lib/api/utils"
 import { fetch as undiciFetch, Agent } from "undici"
 
@@ -18,15 +18,13 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   const { modelId } = await params
   if (!modelId) {
-    // you could choose to return an error here,
-    // but we'll just fall back to mock data
     return NextResponse.json(mockData, { headers: CORS_HEADERS })
   }
 
   try {
     const dispatcher = new Agent({ connect: { rejectUnauthorized: false } })
 
-    const getUrl = `https://reydemo.prefnet.net/QA-Reynaers/Cloud.ModelService/api/v1/Options/model?modelId=${modelId}`
+    const getUrl = API_ENDPOINTS.models.cloudOptions(modelId)
     logApiCall("GET", getUrl)
 
     const getRes = await undiciFetch(getUrl, {
@@ -52,7 +50,7 @@ export async function GET(request: NextRequest, { params }: Params) {
       return NextResponse.json(mockData, { headers: CORS_HEADERS })
     }
 
-    const postUrl = `${API_CONFIG.baseUrl}/KB.UIConfigurator.Service/api/v1/makers/${API_CONFIG.maker}/process-options/${API_CONFIG.uiDefinitionName}`
+    const postUrl = API_ENDPOINTS.configurator.processOptions()
     logApiCall("POST", postUrl)
 
     const postRes = await undiciFetch(postUrl, {
@@ -83,7 +81,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     return NextResponse.json(processedData, { headers: CORS_HEADERS })
   } catch (err) {
-    logApiCall("GET", `/api/configurator/${await params}`, undefined, err)
+    logApiCall("GET", `/api/configurator/${modelId}`, undefined, err)
     console.error("Unexpected error in configurator route:", err)
     return NextResponse.json(mockData, { headers: CORS_HEADERS })
   }

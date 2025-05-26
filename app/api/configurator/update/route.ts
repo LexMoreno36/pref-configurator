@@ -2,7 +2,7 @@ export const runtime = "nodejs"
 
 import { NextResponse } from "next/server"
 import { mockData } from "@/lib/mock-data"
-import { API_CONFIG, CORS_HEADERS } from "@/lib/api/constants"
+import { API_ENDPOINTS, CORS_HEADERS } from "@/lib/api/constants"
 import { logApiCall, readBody, handleCorsOptions } from "@/lib/api/utils"
 import { fetch as undiciFetch, Agent } from "undici"
 
@@ -24,8 +24,8 @@ export async function PUT(request: Request) {
       connect: { rejectUnauthorized: false },
     })
 
-    // Step 1: PUT to kb.api.service to update the option list - use baseUrl and no auth
-    const putUrl = `${API_CONFIG.baseUrl}/KB.api.Service/v1/optionLists/${API_CONFIG.maker}`
+    // Step 1: PUT to update the option list
+    const putUrl = API_ENDPOINTS.configurator.updateOptionList()
     logApiCall("PUT", putUrl)
 
     try {
@@ -56,8 +56,8 @@ export async function PUT(request: Request) {
         return NextResponse.json(mockData, { headers: CORS_HEADERS })
       }
 
-      // Step 2: POST to KB.UIConfigurator.Service to process the updated options - use baseUrl and no auth
-      const postUrl = `${API_CONFIG.baseUrl}/KB.UIConfigurator.Service/api/v1/makers/${API_CONFIG.maker}/process-options/${API_CONFIG.uiDefinitionName}`
+      // Step 2: POST to process the updated options
+      const postUrl = API_ENDPOINTS.configurator.processOptions()
       logApiCall("POST", postUrl)
 
       const postRes = await undiciFetch(postUrl, {

@@ -2,7 +2,7 @@ export const runtime = "nodejs"
 
 import { NextResponse } from "next/server"
 import { mockData } from "@/lib/mock-data"
-import { API_CONFIG, CORS_HEADERS } from "@/lib/api/constants"
+import { API_ENDPOINTS, CORS_HEADERS } from "@/lib/api/constants"
 import { logApiCall, readBody, handleCorsOptions } from "@/lib/api/utils"
 import { fetch as undiciFetch, Agent } from "undici"
 
@@ -17,8 +17,8 @@ export async function GET() {
       connect: { rejectUnauthorized: false },
     })
 
-    // 1. GET OptionList - use baseUrl for KB.api.Service and no auth
-    const getUrl = `${API_CONFIG.baseUrl}/KB.api.Service/v1/optionLists/${API_CONFIG.maker}/${API_CONFIG.optionListName}`
+    // 1. GET OptionList
+    const getUrl = API_ENDPOINTS.configurator.optionList()
     logApiCall("GET", getUrl)
 
     const getRes = await undiciFetch(getUrl, {
@@ -50,8 +50,8 @@ export async function GET() {
       return NextResponse.json(mockData, { headers: CORS_HEADERS })
     }
 
-    // 2. POST to process-options - use baseUrl for KB.UIConfigurator.Service and no auth
-    const postUrl = `${API_CONFIG.baseUrl}/KB.UIConfigurator.Service/api/v1/makers/${API_CONFIG.maker}/process-options/${API_CONFIG.uiDefinitionName}`
+    // 2. POST to process-options
+    const postUrl = API_ENDPOINTS.configurator.processOptions()
     logApiCall("POST", postUrl)
 
     const postRes = await undiciFetch(postUrl, {

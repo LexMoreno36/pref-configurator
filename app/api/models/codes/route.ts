@@ -1,7 +1,7 @@
 export const runtime = "nodejs"
 
 import type { NextRequest } from "next/server"
-import { API_CONFIG } from "@/lib/api/constants"
+import { API_ENDPOINTS, buildUrl } from "@/lib/api/constants"
 import { corsResponse, corsErrorResponse, logApiCall, handleCorsOptions } from "@/lib/api/utils"
 import { fetch as undiciFetch, Agent } from "undici"
 
@@ -25,8 +25,11 @@ export async function GET(request: NextRequest) {
       connect: { rejectUnauthorized: false },
     })
 
-    // Use pwbBaseUrl for items/codes endpoint
-    const url = `${API_CONFIG.pwbBaseUrl}/api/v1/items/codes?pageNumber=1&pageSize=50`
+    const url = buildUrl(API_ENDPOINTS.models.codes(), {
+      pageNumber: 1,
+      pageSize: 50,
+    })
+
     logApiCall("GET", url)
 
     const response = await undiciFetch(url, {
