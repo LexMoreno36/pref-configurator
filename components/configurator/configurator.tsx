@@ -410,9 +410,14 @@ export function Configurator({ modelCode, modelGuid }: { modelCode?: string | nu
               </DialogContent>
             </Dialog>
 
-            <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+            <Button
+              variant="outline"
+              disabled
+              className="flex items-center border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
+            >
               <Info className="mr-2 h-4 w-4" />
               Help
+              <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">Coming Soon</span>
             </Button>
             <Button onClick={handleAddToCart} className="bg-orange-500 text-white hover:bg-orange-600">
               <ShoppingCart className="mr-2 h-4 w-4" />
