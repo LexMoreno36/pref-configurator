@@ -2,7 +2,7 @@ export const runtime = "nodejs"
 
 import type { NextRequest } from "next/server"
 import { fetch, Agent } from "undici"
-import { API_ENDPOINTS, API_CONFIG } from "@/lib/api/constants"
+import { API_ENDPOINTS } from "@/lib/api/constants"
 import { corsResponse, corsErrorResponse, handleCorsOptions, logApiCall } from "@/lib/api/utils"
 
 interface TokenResponse {
@@ -58,18 +58,30 @@ async function fetchNewToken(): Promise<{
   accessToken: string
   expiresIn: number
 }> {
-  // Check if environment variables are set
-  if (!API_CONFIG.username || !API_CONFIG.password) {
-    throw new Error("API credentials are not configured. Please set the environment variables.")
+  // Get credentials directly from environment variables (server-side only)
+  const username = process.env.API_USERNAME
+  const password = process.env.API_PASSWORD
+
+  // Check if credentials are available
+  if (!username || !password) {
+    throw new Error(
+      "API credentials are not configured. Please set API_USERNAME and API_PASSWORD environment variables.",
+    )
   }
 
   const formData = new URLSearchParams({
     grant_type: "password",
-    username: API_CONFIG.username,
-    password: API_CONFIG.password,
+    username,
+    password,
   })
 
   const url = API_ENDPOINTS.auth.token()
+  if (!url) {
+    throw new Error(
+      "Authentication URL is not configured. Please check your NEXT_PUBLIC_BASE_URL environment variable.",
+    )
+  }
+
   logApiCall("POST", url)
 
   // Use Undici's Agent to disable cert validation (only for dev/local)
@@ -94,7 +106,7 @@ async function fetchNewToken(): Promise<{
   logApiCall("POST", url, response.status)
 
   authState.accessToken = data.access_token
-  authState.expiresAt = Date.now() + data.expires_in * 1000 - 300_000
+  authState.expiresAt = Date.now() + data.expires_in * 1000 - 300_000 // Expire 5 minutes early
 
   return {
     accessToken: data.access_token,
