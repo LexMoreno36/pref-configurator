@@ -197,12 +197,11 @@ export default function HomePage() {
           </div>
           <Button
             variant="outline"
-            disabled
-            className="flex items-center border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed opacity-60"
+            className="flex items-center border-gray-200 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            onClick={() => router.push("/documentation")}
           >
             <FileText className="mr-2 h-4 w-4" />
             Documentation
-            <span className="ml-2 text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">Coming Soon</span>
           </Button>
         </div>
       </header>

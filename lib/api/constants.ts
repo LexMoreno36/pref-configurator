@@ -1,12 +1,15 @@
-// API configuration with hardcoded values
+// Get base URL from environment variable or use default
+const API_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://your-domain.com/api"
+
+// API configuration with dynamic base URL
 export const API_CONFIG = {
-  baseUrl: "https://reydemo.prefnet.net/qa-reynaers",
-  pwbBaseUrl: "https://reydemo.prefnet.net/qa-reynaers/prefweb",
-  omniverse: "https://reydemo.prefnet.net",
-  usdServiceUrl: "http://reydemo.prefnet.net:8012",
-  cloudModelServiceUrl: "https://reydemo.prefnet.net/QA-Reynaers/Cloud.ModelService",
-  username: "api@preferencesl.com",
-  password: "api$1234",
+  baseUrl: `${API_BASE_URL}`,
+  pwbBaseUrl: `${API_BASE_URL}/prefweb`,
+  omniverse: `${API_BASE_URL}`,
+  usdServiceUrl: `${API_BASE_URL}:8012`,
+  cloudModelServiceUrl: `${API_BASE_URL}/Cloud.ModelService`,
+  username: process.env.NEXT_PUBLIC_API_USERNAME || "api@preferencesl.com",
+  password: process.env.NEXT_PUBLIC_API_PASSWORD || "api$1234",
   // API parameters
   maker: "reynaers",
   makerCapitalized: "Reynaers", // For cases where capitalized version is needed
