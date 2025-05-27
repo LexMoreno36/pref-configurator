@@ -24,9 +24,9 @@ The deployment process is fully automated through a PowerShell script that handl
 3. **Navigate** to the directory containing the script
 4. **Execute the script**:
 
-\`\`\`powershell
+```powershell
 .\Deploy-NextApp.ps1
-\`\`\`
+```
 
 That's it! The script will handle everything automatically.
 
@@ -62,7 +62,7 @@ The script automatically detects and installs required software:
 ### ecosystem.config.js
 This file configures how PM2 manages the application:
 
-\`\`\`javascript
+```javascript
 module.exports = {
   apps: [{
     name: "pref-configurator",
@@ -76,7 +76,7 @@ module.exports = {
     }
   }]
 }
-\`\`\`
+```
 
 ### Environment Variables
 The application requires environment variables for configuration. Create either:
@@ -93,54 +93,54 @@ Required variables include:
 ## Customization
 
 ### Custom Installation Directory
-\`\`\`powershell
+```powershell
 .\Deploy-NextApp.ps1 -ProjectDir "C:\my-custom-path"
-\`\`\`
+```
 
 ### Custom Repository URL
-\`\`\`powershell
+```powershell
 .\Deploy-NextApp.ps1 -RepoUrl "https://github.com/myuser/myrepo.git"
-\`\`\`
+```
 
 ### Both Custom Parameters
-\`\`\`powershell
+```powershell
 .\Deploy-NextApp.ps1 -ProjectDir "C:\my-app" -RepoUrl "https://github.com/myuser/myrepo.git"
-\`\`\`
+```
 
 ## Post-Deployment Management
 
 ### Check Application Status
-\`\`\`powershell
+```powershell
 pm2 list
-\`\`\`
+```
 
 ### View Application Logs
-\`\`\`powershell
+```powershell
 pm2 logs pref-configurator
-\`\`\`
+```
 
 ### Monitor Application
-\`\`\`powershell
+```powershell
 pm2 monit
-\`\`\`
+```
 
 ### Restart Application
-\`\`\`powershell
+```powershell
 pm2 restart pref-configurator
-\`\`\`
+```
 
 ### Stop Application
-\`\`\`powershell
+```powershell
 pm2 stop pref-configurator
-\`\`\`
+```
 
 ## Updates
 
 To update the application to the latest version, simply run the deployment script again:
 
-\`\`\`powershell
+```powershell
 .\Deploy-NextApp.ps1
-\`\`\`
+```
 
 The script will:
 1. Pull the latest changes from the repository
@@ -152,9 +152,9 @@ The script will:
 
 ### Script Execution Policy
 If you get an execution policy error:
-\`\`\`powershell
+```powershell
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-\`\`\`
+```
 
 ### Package Manager Issues
 - **Winget not found**: The script will automatically try to install Chocolatey
