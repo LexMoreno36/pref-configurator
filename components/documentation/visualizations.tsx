@@ -46,7 +46,7 @@ export function Visualizations() {
 
           <EndpointCard
             method="POST"
-            endpoint={`${API_CONFIG.baseUrl}:8012/usd-service/v1/Session/New`}
+            endpoint={`${API_CONFIG.usdServiceUrl}/usd-service/v1/Session/New`}
             description="Create a new USD service session for photorealistic rendering"
             requestBody={{
               system: API_CONFIG.system,
@@ -61,7 +61,7 @@ export function Visualizations() {
 
           <EndpointCard
             method="GET"
-            endpoint={`${API_CONFIG.baseUrl}:8012/usd-service/v1/Images?sessionId={sessionId}`}
+            endpoint={`${API_CONFIG.usdServiceUrl}/usd-service/v1/Images?sessionId={sessionId}`}
             description="Generate photorealistic PNG images of the configured model"
             responseExample={{
               images: [

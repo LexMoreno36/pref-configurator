@@ -21,8 +21,10 @@ export const API_CONFIG = {
   get omniverse() {
     return this.baseUrl || ""
   },
+  // USD Service has its own base URL (without path, just domain:port)
+  usdServiceBaseUrl: process.env.NEXT_PUBLIC_USD_SERVICE_BASE_URL || "",
   get usdServiceUrl() {
-    return this.baseUrl ? `${this.baseUrl}:8012` : ""
+    return this.usdServiceBaseUrl || ""
   },
   get cloudModelServiceUrl() {
     return this.baseUrl ? `${this.baseUrl}/Cloud.ModelService` : ""
@@ -102,7 +104,7 @@ export const API_ENDPOINTS = {
     },
   },
 
-  // USD Service (PNG Images)
+  // USD Service (PNG Images) - uses separate base URL
   usdService: {
     newSession: () => (API_CONFIG.usdServiceUrl ? `${API_CONFIG.usdServiceUrl}/usd-service/v1/Session/New` : ""),
     images: (sessionId: string) =>
@@ -152,6 +154,7 @@ export function validateEnvironment(): {
   // Variables required on both client and server
   const clientRequiredVars = [
     "NEXT_PUBLIC_BASE_URL",
+    "NEXT_PUBLIC_USD_SERVICE_BASE_URL",
     "NEXT_PUBLIC_DEFAULT_MAKER",
     "NEXT_PUBLIC_MAKER_PREFIX",
     "NEXT_PUBLIC_DEFAULT_SYSTEM",
